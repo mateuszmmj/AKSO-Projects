@@ -33,13 +33,13 @@ struct node {
 };
 
 // A list of rstacks that were deleted using rstack_delete.
-rstack_t *dead = nullptr; 
+static rstack_t *dead = nullptr; 
 // A list of rstacks that werent deleted using rstack_delete.
-rstack_t *living = nullptr; 
+static rstack_t *living = nullptr; 
 
-void rstack_free(rstack_t *rs);
+static void rstack_free(rstack_t *rs);
 
-void dfs(rstack_t *rs) {
+static void dfs(rstack_t *rs) {
     if (rs->seen) {
         return;
     }
@@ -53,7 +53,7 @@ void dfs(rstack_t *rs) {
     }
 }
 
-void start_dfs() {
+static void start_dfs() {
     // We do a mark a sweep to mark all the edges that can be 
     // reached from living rstacks.
     rstack_t *curr = living;
@@ -102,7 +102,7 @@ rstack_t *rstack_new() {
 }
 
 // Only this function free's rstack_t* and node_t*
-void rstack_free(rstack_t *rs) {
+static void rstack_free(rstack_t *rs) {
     if (!rs) {
         return;
     }
@@ -221,7 +221,7 @@ void rstack_pop(rstack_t *rs) {
 // looks for value recursively and if it finds it then it
 // goes back the recursion tree to the caller (either
 // rstack_empty of rstack_front) with the answer.
-result_t _rstack_empty_front(rstack_t *rs, bool val) {
+static result_t _rstack_empty_front(rstack_t *rs, bool val) {
     result_t ans = {false, 0};
     if (!rs) {
         return ans;
@@ -332,13 +332,13 @@ error:
     return nullptr;
 }
 
-int _rstack_write(FILE *f, rstack_t *rs);
+static int _rstack_write(FILE *f, rstack_t *rs);
 
 // Returns 1 if cycle is deteced, -1 if an error occured and 0 otherwise
 // writes out the contents of nodes from bottom to top and
 // writes the value if it holds a value, else calls recursively
 // one _rstack_write.
-int node_write(FILE *f, node_t *node) {
+static int node_write(FILE *f, node_t *node) {
     if (!node) {
         return 0;
     }
@@ -354,18 +354,12 @@ int node_write(FILE *f, node_t *node) {
     if (fprintf(f, "%" PRIu64 "\n", node->data.value) < 0) {
         return -1;
     }
-    if (fflush(f) != 0) {
-        return -1;
-    }
-    if(ferror(f)) {
-        return -1;
-    }
     return 0;
 }
 
 // Returns 1 iff cycle is detected, else returns what node_write returned.
 // writes out the contents of the rstack from bottom to top.
-int _rstack_write(FILE *f, rstack_t *rs) {
+static int _rstack_write(FILE *f, rstack_t *rs) {
     if (rs->seen) {
         return 1;
     }
